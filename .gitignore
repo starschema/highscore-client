@@ -2,3 +2,5 @@ node_modules
 
 .idea
 lib
+index.js.map
+

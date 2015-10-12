@@ -1,4 +1,4 @@
-Request = require "request"
+Request = require "browser-request"
 _ = require "underscore"
 
 REQUEST_INTERVAL = 1*1000
@@ -11,11 +11,11 @@ requestTimer = null
 game = null
 events = []
 
-init: (url) ->
+init = (url) ->
     serverUrl = url
     events = []
 
-startGame: (gameType, user, cb) ->
+startGame = (gameType, user, cb) ->
     # error if connector is not initialized
     if not serverUrl? or serverUrl is ""
         console.log "Couldn't start game, connector is not initialized"
@@ -45,7 +45,7 @@ startGame: (gameType, user, cb) ->
         startEventSenderTimer()
         cb null
 
-eventHappened: (eventType, score) ->
+eventHappened = (eventType, score) ->
     #save event
     events.push
         type: eventType,
@@ -85,7 +85,7 @@ elapsedTime = (time) ->
 startEventSenderTimer = () ->
     requestTimer = setInterval sendEvents, REQUEST_INTERVAL
 
-module.exports =
+window.Highscore = module.exports =
     init: init
     startGame: startGame
     eventHappened: eventHappened
