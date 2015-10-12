@@ -1,4 +1,4 @@
-Request = require "browser-request"
+Request = require 'superagent'
 _ = require "underscore"
 
 REQUEST_INTERVAL = 1*1000
@@ -41,17 +41,15 @@ startGame = (gameType, user, cb) ->
 
     #sending game start to server
     Request
-        method: 'POST'
-        json: true
-        body: JSON.stringify game
-        url: "#{serverUrl}/#{ENDPOINTS.NEW}/#{gameType}"
-    , (err, response, body) ->
-        if error = (isRequestError err, response)
-            console.log "Couldn't start game: #{err.toString()}"
-            return cb?(err)
-        game.id = body["game-id"]
-        startEventSenderTimer()
-        cb?(null)
+        .post "#{serverUrl}/#{ENDPOINTS.NEW}/#{gameType}"
+        .send game
+        .end (err, response) ->
+            if error = (isRequestError err, response)
+                console.log "Couldn't start game: #{err.toString()}"
+                return cb?(err)
+            game.id = response.body["game-id"]
+            startEventSenderTimer()
+            cb?(null)
 
 eventHappened = (eventType, score) ->
     #save event
@@ -79,15 +77,13 @@ sendEvents = () ->
             "events": eventsToSend
 
         Request
-            method: 'POST'
-            json: true
-            body: JSON.stringify message
-            url:  "#{serverUrl}/#{ENDPOINTS.EVENT}"
-        , (err, response, body) ->
-            #if everything was ok
-            unless isRequestError err, response
-                #clear the already sent event from the list
-                _.difference(events, eventsToSend)
+            .post "#{serverUrl}/#{ENDPOINTS.EVENT}"
+            .send message
+            .end (err, response) ->
+                #if everything was ok
+                unless isRequestError err, response
+                    #clear the already sent event from the list
+                    _.difference(events, eventsToSend)
 
 elapsedTime = (time) ->
     if time?
