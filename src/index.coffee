@@ -14,8 +14,11 @@ events = []
 init = (url) ->
     serverUrl = url
     events = []
+    console.log "Initializing highscore client", serverUrl
 
 startGame = (gameType, user, cb) ->
+    console.log "#{user} is starting game: ", gameType
+
     # error if connector is not initialized
     if not serverUrl? or serverUrl is ""
         console.log "Couldn't start game, connector is not initialized"
@@ -37,13 +40,18 @@ startGame = (gameType, user, cb) ->
         clearInterval requestTimer
 
     #sending game start to server
-    Request.post "#{serverUrl}/#{ENDPOINTS.NEW}/#{gameType}", game, (err, response, body) ->
+    Request
+        method: 'POST'
+        json: true
+        body: JSON.stringify game
+        url: "#{serverUrl}/#{ENDPOINTS.NEW}/#{gameType}"
+    , (err, response, body) ->
         if error = (isRequestError err, response)
-            console.log "Couldn't start game: #{error.toString()}"
-            return cb err
+            console.log "Couldn't start game: #{err.toString()}"
+            return cb?(err)
         game.id = body["game-id"]
         startEventSenderTimer()
-        cb null
+        cb?(null)
 
 eventHappened = (eventType, score) ->
     #save event
@@ -56,6 +64,7 @@ eventHappened = (eventType, score) ->
         game.score = score
 
 isRequestError = (err, response) ->
+    return err?
     #return true if everything was ok
     #return false otherwise
 
@@ -69,7 +78,12 @@ sendEvents = () ->
             "duration": elapsedTime()
             "events": eventsToSend
 
-        Request.post "#{serverUrl}/#{ENDPOINTS.EVENT}", message, (err, response, body) ->
+        Request
+            method: 'POST'
+            json: true
+            body: JSON.stringify message
+            url:  "#{serverUrl}/#{ENDPOINTS.EVENT}"
+        , (err, response, body) ->
             #if everything was ok
             unless isRequestError err, response
                 #clear the already sent event from the list

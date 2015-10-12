@@ -27,13 +27,13 @@ gulp.task 'browserify', ['coffee'], ->
     b.bundle()
         .pipe source 'index.js'
         .pipe buffer()
-        .pipe sourcemaps.init {loadMaps: true}
-           .pipe uglify
-               mangle:
-                   toplevel: true
-               compress:
-                   unsafe: true
-        .pipe sourcemaps.write('../')
+        # .pipe sourcemaps.init {loadMaps: true}
+        #    .pipe uglify
+        #        mangle:
+        #            toplevel: true
+        #        compress:
+        #            unsafe: true
+        # .pipe sourcemaps.write('../')
         .pipe gulp.dest 'static/'
 
 
