@@ -28,7 +28,7 @@ startGame = (gameType, user, cb) ->
     game =
         "user-name": user
         "game-type": gameType
-        "start-time": Date.now()
+        "start-time": (new Date()).toISOString()
         "score": 0
         "id": null
 
@@ -70,6 +70,7 @@ sendEvents = () ->
     # if event happened since the last sending
     if events.length isnt 0
         eventsToSend = _.clone events
+        events = []
         message =
             "game-id": game.id
             "score": game.score
@@ -77,19 +78,18 @@ sendEvents = () ->
             "events": eventsToSend
 
         Request
-            .post "#{serverUrl}/#{ENDPOINTS.EVENT}"
+            .post "#{serverUrl}/#{ENDPOINTS.EVENT}/#{game.id}"
             .send message
             .end (err, response) ->
-                #if everything was ok
-                unless isRequestError err, response
-                    #clear the already sent event from the list
-                    _.difference(events, eventsToSend)
+                if err?
+                    console.log err
 
 elapsedTime = (time) ->
+    startTime = new Date(game["start-time"])
     if time?
-        return time - game["start-time"]
+        return time - startTime
     else
-        return Date.now() - game["start-time"]
+        return Date.now() - startTime
 
 
 startEventSenderTimer = () ->
