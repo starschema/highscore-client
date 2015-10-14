@@ -5,11 +5,22 @@ REQUEST_INTERVAL = 1*1000
 ENDPOINTS =
     NEW: "new-game"
     EVENT: "add-events"
+    GET_SCORE: "get-scores"
 
 serverUrl = null
 requestTimer = null
 game = null
 events = []
+
+getScores = (gameType, cb) ->
+    Request
+        .get "#{serverUrl}/#{ENDPOINTS.GET_SCORE}/#{gameType}"
+        .end (err, response) ->
+            if error = (isRequestError err, response)
+                console.log "Couldn't get score: #{err.toString()}"
+                return cb?(err)
+            answer = _.sortBy(response.body[1], "score")
+            cb answer
 
 init = (url) ->
     serverUrl = url
@@ -99,3 +110,4 @@ window.Highscore = module.exports =
     init: init
     startGame: startGame
     eventHappened: eventHappened
+    getScores: getScores
