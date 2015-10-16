@@ -102,6 +102,8 @@ elapsedTime = (time) ->
     else
         return Date.now() - startTime
 
+getGameId = ->
+    game?.id
 
 startEventSenderTimer = () ->
     requestTimer = setInterval sendEvents, REQUEST_INTERVAL
@@ -111,3 +113,4 @@ window.Highscore = module.exports =
     startGame: startGame
     eventHappened: eventHappened
     getScores: getScores
+    gameId: getGameId
