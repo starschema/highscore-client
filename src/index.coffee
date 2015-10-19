@@ -57,10 +57,10 @@ startGame = (gameType, user, cb) ->
         .end (err, response) ->
             if error = (isRequestError err, response)
                 console.log "Couldn't start game: #{err.toString()}"
-                return cb?(err)
+                return cb? err, null
             game.id = response.body["game-id"]
             startEventSenderTimer()
-            cb?(null)
+            cb? null, response.body["game-id"]
 
 eventHappened = (eventType, score) ->
     #save event
